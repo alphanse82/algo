@@ -1,0 +1,56 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "resources": [
+      {
+        "type": "Microsoft.VirtualMachineImages/imageTemplates",
+        "name": "Test1_AIB_FromCuSI_SI_V23",
+        "apiVersion": "2019-05-01-preview",
+        "location": "eastus",
+        "dependsOn": [],
+        "properties": {
+          "buildTimeoutInMinutes" : 600,
+          "source": { 
+              "type": "ManagedImage", 
+              "imageId": "/subscriptions/<subscriptionId>/resourceGroups/<ResourceGroup>/providers/Microsoft.Compute/images/<ImageSource>"
+          },
+          "customize": [
+            {
+                "type": "PowerShell",
+                "name": "InstallingPSModules",
+                "scriptUri": "https://raw.githubusercontent.com/alphanse82/algo/master/InstallWUModules.ps1"
+                
+            },
+            {
+              "type": "WindowsRestart",
+              "restartCheckCommand": "echo Azure-Image-Builder-Restarted-the-VM  > C:\\WindowsUpdateList\\azureImageBuilderRestart.txt",
+              "restartTimeout": "30m"
+            },
+            {
+                "type": "PowerShell",
+                "name": "updatingWindows",
+                "scriptUri": "https://raw.githubusercontent.com/alphanse82/algo/master/WinUpdateSteps2.ps1"
+                
+            },
+            {
+              "type": "WindowsRestart",
+              "restartCheckCommand": "echo Azure-Image-Builder-Restarted-the-VM  > c:\\buildActions\\azureImageBuilderRestart.txt",
+              "restartTimeout": "30m"
+            }
+          ],
+          "distribute": [
+            {   
+              "type":"ManagedImage",
+              "imageId": "/subscriptions/<subscriptionId>/resourceGroups/<ResourceGroup>/providers/Microsoft.Compute/images/<Image_destination>",
+              "location": "eastus",
+              "runOutputName": "winclientR012",
+              "artifactTags": {
+                "source": "azVmImageBuilder",
+                "baseosimg": "0.23947.51855"
+              }
+            }
+          ]
+      }
+    }
+  ]
+}
