@@ -17,6 +17,8 @@ Import-Module PSWindowsUpdate
 Get-WUServiceManager | Out-File "C:\WindowsUpdateList\Setting.log" -Append
 # adding Microsoft update to Server
 Add-WUServiceManager -ServiceID 7971f918-a847-4430-9279-4a52d1efe18d -AddServiceFlag 7 -Confirm:$false
+WhoAMI | Out-File "C:\WindowsUpdateList\Setting.log" -Append
+
 
 $retryCount = 0;
 
